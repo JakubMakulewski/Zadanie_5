@@ -1,4 +1,3 @@
-import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -57,7 +56,7 @@ public class Main {
 
         @Override
         public String toString(){
-            if (label == "no label set")
+            if (label.equals("no label set"))
                 return "Punkt> x:" + x + ", y:" + y + "\n";
             else
                 return "Punkt> x:" + x + ", y:" + y + " - " + label + " -\n";
@@ -75,7 +74,7 @@ public class Main {
         }
     }
 
-    public static class Section extends Figure{
+    public static class Section extends Figure implements Scalable{
         private Point pointA;
         private Point pointB;
         public Section() {
@@ -119,6 +118,29 @@ public class Main {
             distance = Math.sqrt(Math.pow((this.pointA.x+this.pointB.x)/2,2)+Math.pow((this.pointA.y+this.pointB.y)/2,2));
 
             return distance;
+        }
+
+        @Override
+        public void scalePerimeter(double k) {
+            /*
+            double newPerimeter, oldPerimeter, moveCoordinate;
+            double newPointAx, newPointBx, newPointAy, newPointBy;
+
+            oldPerimeter = Math.sqrt( Math.pow((this.pointA.x - this.pointB.x),2) + Math.pow((this.pointA.y - this.pointB.y),2) );
+            newPerimeter = oldPerimeter * k;
+            moveCoordinate = ;
+
+            newPointAx = ;
+            newPointBx = ;
+            newPointAy = ;
+            newPointBy = ;
+
+            this.pointA.x = newPointAx;
+            this.pointB.x = newPointBx;
+            this.pointA.y = newPointAy;
+            this.pointB.y = newPointBy;
+
+             */
         }
     }
 
@@ -197,12 +219,12 @@ public class Main {
         @Override
         public void scalePerimeter(double k) {
             double newPerimeter, oldPerimeter;
-            double newPromien = this.promien;
+            double newPromien;
 
             oldPerimeter = 2 * Math.PI * this.promien;
             newPerimeter = oldPerimeter * k;
 
-            newPromien = newPerimeter/(2 * Math.PI * k);
+            newPromien = newPerimeter/(2 * Math.PI);
 
             this.promien = newPromien;
         }
@@ -287,7 +309,7 @@ public class Main {
 
         public String toStringSortedByLabel(){
             ArrayList<Figure> copy = new ArrayList<>(elements);
-            Collections.sort(copy,new LabelComparator());
+            Collections.sort(copy, new LabelComparator());
 
             Collections.reverse(copy);
 
@@ -296,17 +318,34 @@ public class Main {
 
         public String toStringSortedByDistanceFromOrigin(){
             ArrayList<Figure> copy = new ArrayList<>(elements);
-            Collections.sort(copy,new OriginDistanceComparator());
+            Collections.sort(copy, new OriginDistanceComparator());
             return copy.toString();
         }
 
         public String toStringSortedByClassName(){
             ArrayList<Figure> copy = new ArrayList<>(elements);
-            Collections.sort(copy,new ClassNameComparator());
+            Collections.sort(copy, new ClassNameComparator());
 
             return copy.toString();
         }
 
+        public void fillObjects(int color){
+            for (Figure s : elements) {
+                if (s instanceof Fillable == true){
+                    Fillable e = (Fillable) s;
+                    e.fill(color);
+                }
+            }
+        }
+
+        public void scaleObjects(double k){
+            for (Figure s : elements) {
+                if (s instanceof Scalable == true){
+                    Scalable e = (Scalable) s;
+                    e.scalePerimeter(k);
+                }
+            }
+        }
     }
     public static class UniquePicture extends Picture{
 
