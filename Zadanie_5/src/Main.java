@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.regex.*;
 import java.util.Collections;
-import java.lang.Math.*;
-
+import java.lang.Math;
 
 public class Main {
 
@@ -34,9 +33,6 @@ public class Main {
     public static class Point extends Figure{
         private double x;
         private double y;
-
-        private String className = "Point";
-
         public Point() {
             this.x = 0.00;
             this.y = 0.00;
@@ -82,8 +78,6 @@ public class Main {
     public static class Section extends Figure{
         private Point pointA;
         private Point pointB;
-        private String className = "Section";
-
         public Section() {
             this.pointA.x = 0;
             this.pointA.y = 0;
@@ -136,16 +130,17 @@ public class Main {
         abstract public double getArea();
     }
 
-    public static class Circle extends absCircle{
+    public static class Circle extends absCircle implements Fillable, Scalable{
         private Point srodek;
         private double promien;
-        private String className = "Circle";
+        private String color;
 
         public Circle() {
             this.srodek.x = 0;
             this.srodek.y = 0;
             this.promien = 0;
             this.label = "no label set";
+            this.color = "no_color";
         }
 
         public Circle(Point srodek, double promien) {
@@ -173,7 +168,7 @@ public class Main {
         }
 
         public double getArea(){
-            return Math.pow(this.promien,2)*3.1415;
+            return Math.pow(this.promien,2)*Math.PI;
         }
 
         public double getDistanceFromOrigin(){
@@ -181,6 +176,35 @@ public class Main {
             distance = Math.sqrt(Math.pow(this.srodek.x,2)+Math.pow(this.srodek.y,2));
 
             return distance;
+        }
+
+        @Override
+        public void fill(int color) {
+            if (color == 1){
+                this.color = "red";
+            }
+            else if (color == 2){
+                this.color = "green";
+            }
+            else if (color == 3){
+                this.color = "blue";
+            }
+            else {
+                System.out.println("Error> invalid_color");
+            }
+        }
+
+        @Override
+        public void scalePerimeter(double k) {
+            double newPerimeter, oldPerimeter;
+            double newPromien = this.promien;
+
+            oldPerimeter = 2 * Math.PI * this.promien;
+            newPerimeter = oldPerimeter * k;
+
+            newPromien = newPerimeter/(2 * Math.PI * k);
+
+            this.promien = newPromien;
         }
     }
 
@@ -212,16 +236,16 @@ public class Main {
 
         @Override
         public int compare(Figure o1, Figure o2){
-            if (o1.getDistanceFromOrigin() < o2.getDistanceFromOrigin()){
-                return -1;
-            }
-
-            else if ((o1.getDistanceFromOrigin() > o2.getDistanceFromOrigin())){
-                return 1;
-            }
-
-            else return 0;
+            return o1.getClass().getSimpleName().compareTo(o2.getClass().getSimpleName());
         }
+    }
+
+    interface Fillable{
+        void fill(int color);
+    }
+
+    interface Scalable{
+        void scalePerimeter(double k);
     }
 
     public static abstract class Picture extends Figure{
@@ -264,6 +288,8 @@ public class Main {
         public String toStringSortedByLabel(){
             ArrayList<Figure> copy = new ArrayList<>(elements);
             Collections.sort(copy,new LabelComparator());
+
+            Collections.reverse(copy);
 
             return copy.toString();
         }
@@ -480,11 +506,12 @@ DONE>>  String toStringSortedByLabel() // posortowane po etykiekiecie, malejąco
 DONE>>  String toStringSortedByClassName() // posortowane po nazwie klasy, rosnąco
 DONE>>  String toStringSortedByDistanceFromOrigin() // posortowane wg. odległości punktu centroida obiektu od początku układu współrzędnych.
 
-        Stwórz 2 intefejsy reprezentujace operacje, jakie można wykonać na danym obiekcie graficznym, dodaj ich implementację do wybranych klas:
+DONE>>  Stwórz 2 intefejsy reprezentujace operacje, jakie można wykonać na danym obiekcie graficznym, dodaj ich implementację do wybranych klas:
 
-        Filllable z metodą fill(int color), implementowana przez wszystkie figury z polem (z wyjątkiem Point i Section),
-        Scalable z metodą scalePerimeter(double k), która liniowo skaluje obwód obiektu, zaimplementowana przez wybrane klasy.
+DONE>>  Filllable z metodą fill(int color), implementowana przez wszystkie figury z polem (z wyjątkiem Point i Section),
+DONE>>  Scalable z metodą scalePerimeter(double k), która liniowo skaluje obwód obiektu, zaimplementowana przez wybrane klasy.
 
         Dodaj do klasy Picture metody fillObjects i scaleObjects, która wykonuje operacje fill/scalePerimiter na obiektach posiadających odpowiedni interfejs (wykorzystaj operator instanceof).
+
         Dodaj możliwość zapisu/odczytu obrazu z pliku za pomocą mechanizmu serializacji.
 */
