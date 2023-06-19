@@ -1,25 +1,41 @@
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.regex.*;
+import java.util.Collections;
+import java.lang.Math.*;
+
 
 public class Main {
 
     public static abstract class Figure{
-        String label;
+        public String label;
 
-        String getLabel(){return label;}
+        String getLabel(){
+            return label;
+        }
         void setLabel(String label){
             this.label = label;
         }
+
+
         void move(double dx, double dy){}
 
-        double getArea(){return 0;}
+        double getArea(){
+            return 0;
+        }
+
+        double getDistanceFromOrigin() {
+            return 0;
+        }
     }
 
     public static class Point extends Figure{
         private double x;
         private double y;
+
+        private String className = "Point";
 
         public Point() {
             this.x = 0.00;
@@ -54,11 +70,19 @@ public class Main {
         public double getArea(){
             return 0;
         }
+
+        public double getDistanceFromOrigin(){
+            double distance;
+            distance = Math.sqrt(Math.pow(this.x,2)+Math.pow(this.y,2));
+
+            return distance;
+        }
     }
 
     public static class Section extends Figure{
         private Point pointA;
         private Point pointB;
+        private String className = "Section";
 
         public Section() {
             this.pointA.x = 0;
@@ -95,6 +119,13 @@ public class Main {
         public double getArea(){
             return 0;
         }
+
+        public double getDistanceFromOrigin() {
+            double distance;
+            distance = Math.sqrt(Math.pow((this.pointA.x+this.pointB.x)/2,2)+Math.pow((this.pointA.y+this.pointB.y)/2,2));
+
+            return distance;
+        }
     }
 
     public static abstract class absCircle extends Figure{
@@ -108,6 +139,7 @@ public class Main {
     public static class Circle extends absCircle{
         private Point srodek;
         private double promien;
+        private String className = "Circle";
 
         public Circle() {
             this.srodek.x = 0;
@@ -140,11 +172,58 @@ public class Main {
                 return "Koło> { Środek = " + srodek.toString() + " Promień = " + this.promien + " } - " + label + " -\n";
         }
 
-
         public double getArea(){
-            return this.promien*this.promien*3.1415;
+            return Math.pow(this.promien,2)*3.1415;
+        }
+
+        public double getDistanceFromOrigin(){
+            double distance;
+            distance = Math.sqrt(Math.pow(this.srodek.x,2)+Math.pow(this.srodek.y,2));
+
+            return distance;
         }
     }
+
+    static class LabelComparator implements Comparator<Figure> {
+
+        @Override
+        public int compare(Figure o1, Figure o2){
+            return o1.getLabel().compareTo(o2.getLabel());
+        }
+    }
+
+    static class OriginDistanceComparator implements Comparator<Figure>{
+
+        @Override
+        public int compare(Figure o1, Figure o2){
+            if (o1.getDistanceFromOrigin() < o2.getDistanceFromOrigin()){
+                return -1;
+            }
+
+            else if ((o1.getDistanceFromOrigin() > o2.getDistanceFromOrigin())){
+                return 1;
+            }
+
+            else return 0;
+        }
+    }
+
+    static class ClassNameComparator implements Comparator<Figure>{
+
+        @Override
+        public int compare(Figure o1, Figure o2){
+            if (o1.getDistanceFromOrigin() < o2.getDistanceFromOrigin()){
+                return -1;
+            }
+
+            else if ((o1.getDistanceFromOrigin() > o2.getDistanceFromOrigin())){
+                return 1;
+            }
+
+            else return 0;
+        }
+    }
+
     public static abstract class Picture extends Figure{
 
         public ArrayList<Figure> elements;
@@ -181,6 +260,27 @@ public class Main {
             }
             return sb.toString();
         }
+
+        public String toStringSortedByLabel(){
+            ArrayList<Figure> copy = new ArrayList<>(elements);
+            Collections.sort(copy,new LabelComparator());
+
+            return copy.toString();
+        }
+
+        public String toStringSortedByDistanceFromOrigin(){
+            ArrayList<Figure> copy = new ArrayList<>(elements);
+            Collections.sort(copy,new OriginDistanceComparator());
+            return copy.toString();
+        }
+
+        public String toStringSortedByClassName(){
+            ArrayList<Figure> copy = new ArrayList<>(elements);
+            Collections.sort(copy,new ClassNameComparator());
+
+            return copy.toString();
+        }
+
     }
     public static class UniquePicture extends Picture{
 
@@ -210,7 +310,6 @@ public class Main {
             return false;
         }
     }
-
 
 
     public static void main(String[]args){
@@ -371,3 +470,21 @@ public class Main {
         scanner.close();
     }
 }
+
+/*
+    Zmodyfikuj zadanie z poprzednich zajęć:
+
+DONE>>  Do klasy Picture dodaj 3 metody, zwracające tekstową reprezentację Picture z obiektami posortowanymi według ustalonego porządku (wykorzystaj Arrays.sort i interfejs Comparator):
+
+DONE>>  String toStringSortedByLabel() // posortowane po etykiekiecie, malejąco
+DONE>>  String toStringSortedByClassName() // posortowane po nazwie klasy, rosnąco
+DONE>>  String toStringSortedByDistanceFromOrigin() // posortowane wg. odległości punktu centroida obiektu od początku układu współrzędnych.
+
+        Stwórz 2 intefejsy reprezentujace operacje, jakie można wykonać na danym obiekcie graficznym, dodaj ich implementację do wybranych klas:
+
+        Filllable z metodą fill(int color), implementowana przez wszystkie figury z polem (z wyjątkiem Point i Section),
+        Scalable z metodą scalePerimeter(double k), która liniowo skaluje obwód obiektu, zaimplementowana przez wybrane klasy.
+
+        Dodaj do klasy Picture metody fillObjects i scaleObjects, która wykonuje operacje fill/scalePerimiter na obiektach posiadających odpowiedni interfejs (wykorzystaj operator instanceof).
+        Dodaj możliwość zapisu/odczytu obrazu z pliku za pomocą mechanizmu serializacji.
+*/
