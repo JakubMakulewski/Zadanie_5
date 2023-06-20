@@ -1,3 +1,9 @@
+import java.io.FileNotFoundException;
+import java.io.Serializable;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -362,7 +368,7 @@ public class Main {
         }
 
     }
-    public static class StandarizedPicture extends Picture{
+    public static class StandarizedPicture extends Picture {
         public boolean addElement(Figure element) {
             String tag = element.getLabel();
             Pattern labelPattern = Pattern.compile("^[A-Z][A-Z0-9]*$");         //sprawdzić poprawność kompilacji Pattern
@@ -377,7 +383,7 @@ public class Main {
     }
 
 
-    public static void main(String[]args){
+    public static void main(String[]args) throws FileNotFoundException {
 
         Scanner scanner = new Scanner(System.in);
         String opcja;
@@ -550,7 +556,7 @@ DONE>>  Stwórz 2 intefejsy reprezentujace operacje, jakie można wykonać na da
 DONE>>  Filllable z metodą fill(int color), implementowana przez wszystkie figury z polem (z wyjątkiem Point i Section),
 DONE>>  Scalable z metodą scalePerimeter(double k), która liniowo skaluje obwód obiektu, zaimplementowana przez wybrane klasy.
 
-        Dodaj do klasy Picture metody fillObjects i scaleObjects, która wykonuje operacje fill/scalePerimiter na obiektach posiadających odpowiedni interfejs (wykorzystaj operator instanceof).
+DONE>>  Dodaj do klasy Picture metody fillObjects i scaleObjects, która wykonuje operacje fill/scalePerimiter na obiektach posiadających odpowiedni interfejs (wykorzystaj operator instanceof).
 
         Dodaj możliwość zapisu/odczytu obrazu z pliku za pomocą mechanizmu serializacji.
 */
