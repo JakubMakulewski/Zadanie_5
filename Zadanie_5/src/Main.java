@@ -148,6 +148,7 @@ public class Main {
 
              */
         }
+
     }
 
     public static abstract class absCircle extends Figure implements  Serializable{
@@ -270,11 +271,11 @@ public class Main {
 
     interface Fillable{
         void fill(int color);
-    }
+    }       //do polecenia 2), implementowana w Circle
 
     interface Scalable{
         void scalePerimeter(double k);
-    }
+    }       //do polecenia 2), implementowana w Circle
 
     public static abstract class Picture extends Figure implements Serializable{
 
@@ -320,20 +321,20 @@ public class Main {
             Collections.reverse(copy);
 
             return copy.toString();
-        }
+        }       //do polecenia 1)
 
         public String toStringSortedByDistanceFromOrigin(){
             ArrayList<Figure> copy = new ArrayList<>(elements);
             Collections.sort(copy, new OriginDistanceComparator());
             return copy.toString();
-        }
+        }       //do polecenia 1)
 
         public String toStringSortedByClassName(){
             ArrayList<Figure> copy = new ArrayList<>(elements);
             Collections.sort(copy, new ClassNameComparator());
 
             return copy.toString();
-        }
+        }       //do polecenia 1)
 
         public void fillObjects(int color){
             for (Figure s : elements) {
@@ -342,7 +343,7 @@ public class Main {
                     e.fill(color);
                 }
             }
-        }
+        }       //do polecenia 3), implementowana w Circle
 
         public void scaleObjects(double k){
             for (Figure s : elements) {
@@ -351,7 +352,7 @@ public class Main {
                     e.scalePerimeter(k);
                 }
             }
-        }
+        }       //do polecenia 3), implementowana w Circle i Section (w section nie wykonuje żadnego działania)
     }
     public static class UniquePicture extends Picture implements Serializable{
 
@@ -479,7 +480,7 @@ public class Main {
 
             return currentState;
         }
-    }
+    }       //do polecenia 4), zastosowana w main
 
 
     public static void main(String[]args) throws FileNotFoundException {
@@ -701,18 +702,22 @@ public class Main {
 /*
     Zmodyfikuj zadanie z poprzednich zajęć:
 
+DONE>>  1)
 DONE>>  Do klasy Picture dodaj 3 metody, zwracające tekstową reprezentację Picture z obiektami posortowanymi według ustalonego porządku (wykorzystaj Arrays.sort i interfejs Comparator):
 
 DONE>>  String toStringSortedByLabel() // posortowane po etykiekiecie, malejąco
 DONE>>  String toStringSortedByClassName() // posortowane po nazwie klasy, rosnąco
 DONE>>  String toStringSortedByDistanceFromOrigin() // posortowane wg. odległości punktu centroida obiektu od początku układu współrzędnych.
 
+DONE>>  2)
 DONE>>  Stwórz 2 intefejsy reprezentujace operacje, jakie można wykonać na danym obiekcie graficznym, dodaj ich implementację do wybranych klas:
 
 DONE>>  Filllable z metodą fill(int color), implementowana przez wszystkie figury z polem (z wyjątkiem Point i Section),
 DONE>>  Scalable z metodą scalePerimeter(double k), która liniowo skaluje obwód obiektu, zaimplementowana przez wybrane klasy.
 
+DONE>>  3)
 DONE>>  Dodaj do klasy Picture metody fillObjects i scaleObjects, która wykonuje operacje fill/scalePerimiter na obiektach posiadających odpowiedni interfejs (wykorzystaj operator instanceof).
 
-        Dodaj możliwość zapisu/odczytu obrazu z pliku za pomocą mechanizmu serializacji.
+DONE>>  4)
+DONE>>  Dodaj możliwość zapisu/odczytu obrazu z pliku za pomocą mechanizmu serializacji.
 */
