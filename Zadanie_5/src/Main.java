@@ -276,7 +276,7 @@ public class Main {
         void scalePerimeter(double k);
     }
 
-    public static abstract class Picture extends Figure{
+    public static abstract class Picture extends Figure implements Serializable{
 
         public ArrayList<Figure> elements;
 
@@ -379,6 +379,65 @@ public class Main {
             }
             System.out.println(tag+" zawiera niedozwolone znaki");
             return false;
+        }
+    }
+
+    public static class PictureFileSaverLoader{
+        Picture uniquePictureToSave = new UniquePicture();
+        Picture standardizedPictureToSave = new StandarizedPicture();
+
+        public Picture getUniquePictureToSave() {
+            return uniquePictureToSave;
+        }
+
+        public void setUniquePictureToSave(Picture uniquePictureToSave) {
+            this.uniquePictureToSave = uniquePictureToSave;
+        }
+
+        public Picture getStandardizedPictureToSave() {
+            return standardizedPictureToSave;
+        }
+
+        public void setStandardizedPictureToSave(Picture standardizedPictureToSave) {
+            this.standardizedPictureToSave = standardizedPictureToSave;
+        }
+
+        void save(String filePath, Picture pictureToSave){
+            try {
+                FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+                ObjectOutputStream pictureOutputStream = new ObjectOutputStream(fileOutputStream);
+
+                pictureOutputStream.writeObject(pictureToSave);
+
+                pictureOutputStream.close();
+                fileOutputStream.close();
+
+                System.out.println("Pomyślnie zapisano obraz\n");
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        Picture load(String filePath){
+            try{
+                FileInputStream fileInputStream = new FileInputStream(filePath);
+                ObjectInputStream pictureInputStream = new ObjectInputStream(fileInputStream);
+
+                Picture loaded = (Picture) pictureInputStream.readObject();
+
+                pictureInputStream.close();
+                fileInputStream.close();
+
+                System.out.println("Pomyślnie wczytano obraz\n");
+
+                return loaded;
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+            System.out.println("Błąd: Wczytywanie obrazu nie powiodło się\n");
+
+            return null;
         }
     }
 
