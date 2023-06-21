@@ -13,7 +13,7 @@ import java.lang.Math;
 
 public class Main {
 
-    public static abstract class Figure{
+    public static abstract class Figure implements Serializable{
         public String label;
 
         String getLabel(){
@@ -35,7 +35,7 @@ public class Main {
         }
     }
 
-    public static class Point extends Figure{
+    public static class Point extends Figure implements Serializable{
         private double x;
         private double y;
         public Point() {
@@ -80,7 +80,7 @@ public class Main {
         }
     }
 
-    public static class Section extends Figure implements Scalable{
+    public static class Section extends Figure implements Scalable, Serializable{
         private Point pointA;
         private Point pointB;
         public Section() {
@@ -150,7 +150,7 @@ public class Main {
         }
     }
 
-    public static abstract class absCircle extends Figure{
+    public static abstract class absCircle extends Figure implements  Serializable{
         abstract public void move(double dx, double dy);
 
         abstract public String toString();
@@ -158,7 +158,7 @@ public class Main {
         abstract public double getArea();
     }
 
-    public static class Circle extends absCircle implements Fillable, Scalable{
+    public static class Circle extends absCircle implements Fillable, Scalable, Serializable{
         private Point srodek;
         private double promien;
         private String color;
@@ -353,7 +353,7 @@ public class Main {
             }
         }
     }
-    public static class UniquePicture extends Picture{
+    public static class UniquePicture extends Picture implements Serializable{
 
         @Override
         public boolean addElement(Figure element) {
@@ -368,7 +368,7 @@ public class Main {
         }
 
     }
-    public static class StandarizedPicture extends Picture {
+    public static class StandarizedPicture extends Picture implements Serializable{
         public boolean addElement(Figure element) {
             String tag = element.getLabel();
             Pattern labelPattern = Pattern.compile("^[A-Z][A-Z0-9]*$");         //sprawdzić poprawność kompilacji Pattern
@@ -402,7 +402,7 @@ public class Main {
             this.standardizedPictureToSave = standardizedPictureToSave;
         }
 
-        void save(String filePath, Picture pictureToSave){
+        void saveUnique(String filePath, UniquePicture pictureToSave){
             try {
                 FileOutputStream fileOutputStream = new FileOutputStream(filePath);
                 ObjectOutputStream pictureOutputStream = new ObjectOutputStream(fileOutputStream);
@@ -415,15 +415,34 @@ public class Main {
                 System.out.println("Pomyślnie zapisano obraz\n");
             }
             catch (Exception e){
+                System.out.println("Błąd: Wczytywanie obrazu nie powiodło się\n");
                 e.printStackTrace();
             }
         }
-        Picture load(String filePath){
+
+        void saveStd(String filePath, StandarizedPicture pictureToSave){
+            try {
+                FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+                ObjectOutputStream pictureOutputStream = new ObjectOutputStream(fileOutputStream);
+
+                pictureOutputStream.writeObject(pictureToSave);
+
+                pictureOutputStream.close();
+                fileOutputStream.close();
+
+                System.out.println("Pomyślnie zapisano obraz\n");
+            }
+            catch (Exception e){
+                System.out.println("Błąd: Wczytywanie obrazu nie powiodło się\n");
+                e.printStackTrace();
+            }
+        }
+        UniquePicture loadUnique(String filePath, UniquePicture currentState){
             try{
                 FileInputStream fileInputStream = new FileInputStream(filePath);
                 ObjectInputStream pictureInputStream = new ObjectInputStream(fileInputStream);
 
-                Picture loaded = (Picture) pictureInputStream.readObject();
+                UniquePicture loaded = (UniquePicture) pictureInputStream.readObject();
 
                 pictureInputStream.close();
                 fileInputStream.close();
@@ -433,11 +452,32 @@ public class Main {
                 return loaded;
             }
             catch(Exception e){
+                System.out.println("Błąd: Wczytywanie obrazu nie powiodło się\n");
                 e.printStackTrace();
             }
-            System.out.println("Błąd: Wczytywanie obrazu nie powiodło się\n");
 
-            return null;
+            return currentState;
+        }
+        StandarizedPicture loadStd(String filePath, StandarizedPicture currentState){
+            try{
+                FileInputStream fileInputStream = new FileInputStream(filePath);
+                ObjectInputStream pictureInputStream = new ObjectInputStream(fileInputStream);
+
+                StandarizedPicture loaded = (StandarizedPicture) pictureInputStream.readObject();
+
+                pictureInputStream.close();
+                fileInputStream.close();
+
+                System.out.println("Pomyślnie wczytano obraz\n");
+
+                return loaded;
+            }
+            catch(Exception e){
+                System.out.println("Błąd: Wczytywanie obrazu nie powiodło się\n");
+                e.printStackTrace();
+            }
+
+            return currentState;
         }
     }
 
@@ -451,13 +491,26 @@ public class Main {
         UniquePicture picture = new UniquePicture();
         StandarizedPicture StdPicture = new StandarizedPicture();
 
+        PictureFileSaverLoader saverLoader = new PictureFileSaverLoader();
+        String fileDirectoryUnique = new String("uniquepicture.txt");
+        String fileDirectoryStd = new String("stdpicture.txt");
+
         do {
             opcja = "";
             wybierzObraz = 0;
 
-            System.out.println("1. Dodaj do obrazu\n2. Wyświetl Obraz\n3. Przesuń Obraz\n4. Wyświetl Sumę Pól\nw Wyjdź\nWybierz>");
+            System.out.println("1. Dodaj do obrazu\n" +
+                    "2. Wyświetl Obraz\n" +
+                    "3. Przesuń Obraz\n" +
+                    "4. Wyświetl Sumę Pól\n" +
+                    "5. Zapisz Obraz\n" +
+                    "6. Wczytaj Obraz\n" +
+                    "w Wyjdź\n" +
+                    "Wybierz>");
+
             opcja = scanner.nextLine();
             switch (opcja) {
+
                 case "1":
                     System.out.println("Do którego obrazu chcesz dodać?\n1 UniquePicture\n2 StandarizedPicture\nWybierz>");
                     wybierzObraz=scanner.nextInt();
@@ -544,6 +597,7 @@ public class Main {
                         System.out.println("Błąd. Nie ma takiego obrazu");
                     }
                     break;
+
                 case "2":
                     System.out.println("Który obraz chcesz wyświetlić?\n1 UniquePicture\n2 StandarizedPicture\nWybierz>");
                     wybierzObraz = scanner.nextInt();
@@ -559,8 +613,12 @@ public class Main {
                         System.out.println("Błąd. Nie ma takiego obrazu");
                     }
                     break;
+
                 case "3":
-                    System.out.println("Który obraz chcesz przesunąć?\n1 UniquePicture\n2 StandarizedPicture\nWybierz>");
+                    System.out.println("Który obraz chcesz przesunąć?\n" +
+                                        "1 UniquePicture\n" +
+                                        "2 StandarizedPicture\n" +
+                                        "Wybierz>");
                     wybierzObraz = scanner.nextInt();
                     scanner.nextLine();
                     if(wybierzObraz == 1 || wybierzObraz == 2){
@@ -578,6 +636,7 @@ public class Main {
                         System.out.println("Błąd. Nie ma takiego obrazu");
                     }
                     break;
+
                 case "4":
                     double area=0;
                     System.out.println("Sumę pól którego obrazu chcesz uzyskać?\n1 UniquePicture\n2 StandarizedPicture\nWybierz>");
@@ -593,6 +652,44 @@ public class Main {
                         System.out.println("Suma pól: " + area);
                     }else{
                         System.out.println("Błąd. Nie ma takiego obrazu");
+                    }
+                    break;
+
+                case "5":
+                    System.out.println("Który obraz chcesz zapisać do pliku?\n" +
+                                        "1 UniquePicture\n" +
+                                        "2 StandarizedPicture\n" +
+                                        "Wybierz>");
+
+                    opcja = scanner.nextLine();
+                    switch (opcja) {
+
+                        case "1":
+                            saverLoader.saveUnique(fileDirectoryUnique, picture);
+                            break;
+
+                        case "2":
+                            saverLoader.saveStd(fileDirectoryStd, StdPicture);
+                            break;
+                    }
+                    break;
+
+                case "6":
+                    System.out.println("Do którego obrazu chcesz wczytać zawartość pliku?\n" +
+                                        "1 UniquePicture\n" +
+                                        "2 StandarizedPicture\n" +
+                                        "Wybierz>");
+
+                    opcja = scanner.nextLine();
+                    switch (opcja) {
+
+                        case "1":
+                            picture = saverLoader.loadUnique(fileDirectoryUnique, picture);
+                            break;
+
+                        case "2":
+                            StdPicture = saverLoader.loadStd(fileDirectoryStd, StdPicture);
+                            break;
                     }
                     break;
             }
